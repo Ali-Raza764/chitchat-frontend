@@ -1,12 +1,12 @@
 import Link from "next/link";
 import React from "react";
 
-const ChatListItem = ({ name, message, time, unreadCount, avatar }) => {
+const ChatListItem = ({ name, message, time, unreadCount, avatar, userId }) => {
   return (
-    <Link href={`/chat/26382749378hjhj`}>
+    <Link href={`/chat/${userId}`}>
       <div className="flex items-center p-4 hover:bg-gray-700 cursor-pointer">
         <img
-          src={"https://dummyimage.com/50x50"}
+          src={avatar}
           alt={name}
           className="w-12 h-12 rounded-full mr-4 flex-shrink-0"
         />

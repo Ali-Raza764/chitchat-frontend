@@ -4,7 +4,6 @@ import ProfileDetails from "./ProfileDetails";
 
 const Profile = async () => {
   const session = await auth();
-  console.log(session);
 
   if (!session) {
     return <div className="text-center text-gray-400">Not signed in</div>;

@@ -1,26 +1,39 @@
 "use client";
-import { FaChevronCircleRight } from "react-icons/fa";
+import { FaChevronCircleRight, FaSpinner } from "react-icons/fa";
+import sendMessage from "@/actions/messages/sendMessage.action";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const MessageForm = ({ data, setData }) => {
+const MessageForm = ({ userId, chatId, data, setData }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
+    setLoading(true);
+    try {
+      e.preventDefault();
+      const text = e.target.message.value;
+      const payload = {
+        chatId,
+        text,
+      };
+      const response = await sendMessage(payload);
+
+      setData([...data, response]);
+      e.target.reset();
+    } catch (error) {
+      setError("Error sending message");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="absolute bottom-0 border-t border-gray-700 w-full px-4 p-2 h-[10%]">
       <form
         action=""
-        onSubmit={(e) => {
-          e.preventDefault();
-          setData([
-            ...data,
-            {
-              id: new Date().getTime().toString(),
-              text: e.target.message.value,
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              statusSeen: true,
-              sender: "Me",
-              receiver: "Mama",
-            },
-          ]);
-          e.target.reset();
-        }}
+        onSubmit={handleSubmit}
         className="w-full flex items-center gap-3"
       >
         <input
@@ -28,13 +41,20 @@ const MessageForm = ({ data, setData }) => {
           name="message"
           id="message"
           placeholder="Type your message"
-          className="w-full p-2 rounded-md outline-none border border-transparent focus:border-green-500"
+          className={`w-full p-2 rounded-md outline-none border border-transparent focus:border-green-500 ${
+            error && "border border-red-600"
+          }`}
+          disabled={loading}
         />
-        <button type="submit">
-          <FaChevronCircleRight
-            className="text-green-500 bg-white rounded-full"
-            size={35}
-          />
+        <button type="submit" disabled={loading}>
+          {loading ? (
+            <FaSpinner className="animate-spin" />
+          ) : (
+            <FaChevronCircleRight
+              className="text-green-500 bg-white rounded-full"
+              size={35}
+            />
+          )}
         </button>
       </form>
     </div>

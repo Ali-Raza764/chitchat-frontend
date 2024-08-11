@@ -14,8 +14,8 @@ const FriendRequests = ({ requests, sessionId }) => {
     useState(requests);
   const router = useRouter();
 
-  if (FriendRequests.length === 0) {
-    return <p className="text-sm">Nothing to show Here</p>;
+  if (incomingFriendRequests.length === 0) {
+    return <p className="text-md text-white">Nothing to show Here</p>;
   }
 
   const acceptFriend = async (friendId) => {
@@ -37,7 +37,7 @@ const FriendRequests = ({ requests, sessionId }) => {
   return (
     <div>
       {incomingFriendRequests.map((request) => (
-        <div className="flex gap-4 items-center p-1 border">
+        <div className="flex gap-4 items-center p-1 border" key={request.id}>
           <Image
             src={request.image}
             height={50}

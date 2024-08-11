@@ -1,19 +1,24 @@
 "use server";
-import { auth } from "@/auth";
+// import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { validateEmail } from "@/lib/validations/validateEmail";
+import isAuthorized from "@/utils/auth/isAuthorized";
 
 export const addFriend = async (payload) => {
   try {
-    const session = await auth();
-    if (!session) {
+    const { email } = payload;
+    const { authorized, status, message, currentUserId } = await isAuthorized(
+      email
+    );
+
+    if (!authorized) {
       return {
-        status: 401,
-        message: "Not Authorized",
+        status,
+        message,
       };
     }
 
-    const { email } = payload;
+    console.log(email, currentUserId);
 
     if (!validateEmail(email)) {
       return {
@@ -31,7 +36,7 @@ export const addFriend = async (payload) => {
       };
     }
 
-    if (friendId === session.user.id) {
+    if (friendId === currentUserId) {
       return {
         status: 400,
         message: "Cannot send request to yourself",
@@ -47,9 +52,21 @@ export const addFriend = async (payload) => {
       };
     }
 
+    // * Check if request already exists
+    // const requestExists = await db.get(
+    //   `user:${friendId}:receivedRequests`,
+    //   currentUserId
+    // );
+    // if (requestExists) {
+    //   return {
+    //     status: 400,
+    //     message: "Request already exists",
+    //   };
+    // }
+
     //* Send friend request
     const receivedRequestsKey = `user:${friendId}:receivedRequests`;
-    await db.sadd(receivedRequestsKey, session.user.id);
+    await db.sadd(receivedRequestsKey, currentUserId);
 
     return {
       status: 200,
@@ -59,35 +76,22 @@ export const addFriend = async (payload) => {
     console.error("Error in addFriend:", error);
     return {
       status: 500,
-      message: "An error occurred: " + error.message,
+      message: "An error occurred",
     };
   }
 };
 
 export const confirmFriend = async (payload) => {
   try {
-    const session = await auth();
-    if (!session) {
-      return {
-        status: 401,
-        message: "Not Authorized",
-      };
-    }
-
     const { id: friendId } = payload;
+    const { authorized, status, message, currentUserId } = await isAuthorized(
+      friendId
+    );
 
-    if (!friendId) {
+    if (!authorized) {
       return {
-        status: 400,
-        message: "Friend ID is required",
-      };
-    }
-
-    const currentUserId = session.user.id;
-    if (!currentUserId) {
-      return {
-        status: 500,
-        message: "Current user ID is missing",
+        status,
+        message,
       };
     }
 
@@ -125,28 +129,15 @@ export const confirmFriend = async (payload) => {
 
 export const denyFriendRequest = async (payload) => {
   try {
-    const session = await auth();
-    if (!session) {
-      return {
-        status: 401,
-        message: "Not Authorized",
-      };
-    }
-
     const { id: friendId } = payload;
+    const { authorized, status, message, currentUserId } = await isAuthorized(
+      friendId
+    );
 
-    if (!friendId) {
+    if (!authorized) {
       return {
-        status: 400,
-        message: "Friend ID is required",
-      };
-    }
-
-    const currentUserId = session.user.id;
-    if (!currentUserId) {
-      return {
-        status: 500,
-        message: "Current user ID is missing",
+        status,
+        message,
       };
     }
 
@@ -175,28 +166,15 @@ export const denyFriendRequest = async (payload) => {
 
 export const removeFriend = async () => {
   try {
-    const session = await auth();
-    if (!session) {
-      return {
-        status: 401,
-        message: "Not Authorized",
-      };
-    }
-
     const { id: friendId } = payload;
+    const { authorized, status, message, currentUserId } = await isAuthorized(
+      friendId
+    );
 
-    if (!friendId) {
+    if (!authorized) {
       return {
-        status: 400,
-        message: "Friend ID is required",
-      };
-    }
-
-    const currentUserId = session.user.id;
-    if (!currentUserId) {
-      return {
-        status: 500,
-        message: "Current user ID is missing",
+        status,
+        message,
       };
     }
 
@@ -206,6 +184,8 @@ export const removeFriend = async () => {
       `user:${friendId}:friends`,
       currentUserId
     );
+    console.log(removeUser, removeFriend);
+
     if (removeFriend && removeUser) {
       return {
         status: 200,
