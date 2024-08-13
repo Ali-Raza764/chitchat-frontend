@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 import { MdCall, MdVideoCall } from "react-icons/md";
 
@@ -5,7 +6,9 @@ const ChatFeedHeader = ({ friendData }) => {
   return (
     <div className="flex items-center justify-between px-4 py-3 h-[10%] sticky top-0 w-full border-b border-gray-700">
       <div className="flex gap-4 items-center">
-        <img
+        <Image
+          height={40}
+          width={40}
           src={friendData.image}
           alt="avatar"
           className="rounded-full h-10 w-10"

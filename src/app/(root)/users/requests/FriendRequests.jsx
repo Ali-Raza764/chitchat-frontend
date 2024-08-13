@@ -3,16 +3,37 @@ import {
   confirmFriend,
   denyFriendRequest,
 } from "@/actions/user/addFriend.action";
+import { pusherClient, toPusherKey } from "@/lib/pusher/pusher";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiCheck } from "react-icons/bi";
 import { MdClose } from "react-icons/md";
 
 const FriendRequests = ({ requests, sessionId }) => {
   const [incomingFriendRequests, setIncomingFriendRequests] =
     useState(requests);
+
   const router = useRouter();
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:receivedRequests`));
+    console.log("listening to ", `user:${sessionId}:receivedRequests`);
+
+    const friendRequestHandler = (user) => {
+      console.log("function got called for request", user);
+      setIncomingFriendRequests((prev) => [...prev, user]);
+    };
+
+    pusherClient.bind("receivedRequests", friendRequestHandler);
+
+    return () => {
+      pusherClient.unsubscribe(
+        toPusherKey(`user:${sessionId}:receivedRequests`)
+      );
+      pusherClient.unbind("receivedRequests", friendRequestHandler);
+    };
+  }, [sessionId]);
 
   if (incomingFriendRequests.length === 0) {
     return <p className="text-md text-white">Nothing to show Here</p>;
@@ -43,6 +64,7 @@ const FriendRequests = ({ requests, sessionId }) => {
             height={50}
             width={50}
             className="rounded-full"
+            alt="User-image"
           />
           <p>{request.email}</p>
           {/* <ConfirmButton friendId={request.id} /> */}

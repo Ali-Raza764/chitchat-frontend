@@ -2,6 +2,7 @@
 import ChatFeedHeader from "@/components/shared/Chats/ChatFeedHeader";
 import MessageForm from "@/components/shared/Chats/MessageForm";
 import MessageItem from "@/components/shared/Chats/MessageItem";
+import { toPusherKey } from "@/lib/pusher/pusher";
 import { useState, useEffect, useRef } from "react";
 
 const Chat = ({ messages, userId, friendId, chatId, friendData }) => {
@@ -18,16 +19,22 @@ const Chat = ({ messages, userId, friendId, chatId, friendData }) => {
   }, [data]);
 
   useEffect(() => {
-    const eventSource = new EventSource("/api/stream?chatId=" + chatId);
+    pusherClient.subscribe(toPusherKey(`chat:${chatId}:messages`));
 
-    eventSource.onmessage = (event) => {
-      console.log(event.data);
+    console.log("listening to ", `chat:${chatId}:messages`);
+
+    const friendRequestHandler = (message) => {
+      console.log("function got called for request", user);
+      setData([...data, message]);
     };
+
+    pusherClient.bind("receivedRequests", friendRequestHandler);
 
     return () => {
-      eventSource.close();
+      pusherClient.unsubscribe(toPusherKey(`chat:${chatId}:messages`));
+      pusherClient.unbind("receivedRequests", friendRequestHandler);
     };
-  }, []);
+  }, [chatId, data]);
 
   return (
     <div className="w-full h-full relative">

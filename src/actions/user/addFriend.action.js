@@ -1,6 +1,7 @@
 "use server";
 // import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { pusherServer, toPusherKey } from "@/lib/pusher/pusher";
 import { validateEmail } from "@/lib/validations/validateEmail";
 import isAuthorized from "@/utils/auth/isAuthorized";
 
@@ -17,8 +18,6 @@ export const addFriend = async (payload) => {
         message,
       };
     }
-
-    console.log(email, currentUserId);
 
     if (!validateEmail(email)) {
       return {
@@ -52,21 +51,17 @@ export const addFriend = async (payload) => {
       };
     }
 
-    // * Check if request already exists
-    // const requestExists = await db.get(
-    //   `user:${friendId}:receivedRequests`,
-    //   currentUserId
-    // );
-    // if (requestExists) {
-    //   return {
-    //     status: 400,
-    //     message: "Request already exists",
-    //   };
-    // }
-
     //* Send friend request
     const receivedRequestsKey = `user:${friendId}:receivedRequests`;
     await db.sadd(receivedRequestsKey, currentUserId);
+
+    //* Get the user data and send it immediately to the client
+    const userData = await db.get(`user:${friendId}`);
+    await pusherServer.trigger(
+      toPusherKey(`user:${friendId}:receivedRequests`),
+      "receivedRequests",
+      userData
+    );
 
     return {
       status: 200,
@@ -113,6 +108,14 @@ export const confirmFriend = async (payload) => {
     // Add current user to friend's friend list
     const friendFriendsKey = `user:${friendId}:friends`;
     await db.sadd(friendFriendsKey, currentUserId);
+
+    //* Fetch the user data and send it immediately to the client
+    console.log("Fetching friend data");
+    const userData = await db.get(`user:${friendId}`);
+    console.log(userData);
+
+    //* Notify the the request sender  that the request has been confirmed
+    await pusherServer.trigger(`user:${friendId}:chats`, "chats", userData);
 
     return {
       status: 200,
@@ -184,7 +187,6 @@ export const removeFriend = async () => {
       `user:${friendId}:friends`,
       currentUserId
     );
-    console.log(removeUser, removeFriend);
 
     if (removeFriend && removeUser) {
       return {

@@ -8,6 +8,7 @@ import {
 } from "react-icons/bi";
 import { MdConnectWithoutContact } from "react-icons/md";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 const LandingPage = async () => {
   const session = await auth();
@@ -35,7 +36,9 @@ const LandingPage = async () => {
 
         {/* Right Side: Image and Sign-in Button */}
         <div className="md:w-1/2 flex flex-col items-center md:items-end justify-start">
-          <img
+          <Image
+            height={500}
+            width={500}
             src="/images/hero.webp"
             alt="Chat Image"
             className="max-w-[25rem] w-full mb-6 rounded-lg"

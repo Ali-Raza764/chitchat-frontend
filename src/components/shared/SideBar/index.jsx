@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import Chats from "../Chats";
 import NavBar from "./NavBar";
 import { FaSpinner } from "react-icons/fa";
+import SideBarChatComponent from "../Chats/SideBarChatComponent";
 
 const Sidebar = ({ children }) => {
   return (
@@ -15,7 +15,7 @@ const Sidebar = ({ children }) => {
             </div>
           }
         >
-          <Chats />
+          <SideBarChatComponent />
         </Suspense>
       </div>
 

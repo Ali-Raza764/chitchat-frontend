@@ -1,6 +1,7 @@
 "use client";
-import { FaUserCircle, FaEdit, FaSave } from "react-icons/fa";
+import { FaEdit, FaSave } from "react-icons/fa";
 import { useState } from "react";
+import Image from "next/image";
 
 const ProfileDetails = ({ session }) => {
   const [name, setName] = useState(session.user.name);
@@ -15,12 +16,13 @@ const ProfileDetails = ({ session }) => {
   return (
     <div className="w-full">
       <div className="flex flex-col items-center mb-4">
-        <img
+        <Image
+          height={100}
+          width={100}
           src={image}
           alt="Profile"
           className="w-24 h-24 rounded-full mb-2"
         />
-      
       </div>
       <div className="email flex items-start w-full gap-3">
         <label
@@ -52,8 +54,8 @@ const ProfileDetails = ({ session }) => {
               <FaSave className="inline mr-2" /> Save
             </button>
           </div>
-        ):(
-            <button
+        ) : (
+          <button
             onClick={() => setEditing(!editing)}
             className="text-gray-400 hover:text-gray-200"
           >

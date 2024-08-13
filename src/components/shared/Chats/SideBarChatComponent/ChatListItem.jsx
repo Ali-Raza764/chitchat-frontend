@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -5,7 +6,9 @@ const ChatListItem = ({ name, message, time, unreadCount, avatar, userId }) => {
   return (
     <Link href={`/chat/${userId}`}>
       <div className="flex items-center p-4 hover:bg-gray-700 cursor-pointer">
-        <img
+        <Image
+          height={40}
+          width={40}
           src={avatar}
           alt={name}
           className="w-12 h-12 rounded-full mr-4 flex-shrink-0"
