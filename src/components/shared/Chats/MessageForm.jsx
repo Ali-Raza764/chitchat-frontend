@@ -2,12 +2,10 @@
 import { FaChevronCircleRight, FaSpinner } from "react-icons/fa";
 import sendMessage from "@/actions/messages/sendMessage.action";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
-const MessageForm = ({ userId, chatId, data, setData }) => {
+const MessageForm = ({ chatId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const router = useRouter();
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -18,9 +16,7 @@ const MessageForm = ({ userId, chatId, data, setData }) => {
         chatId,
         text,
       };
-      const response = await sendMessage(payload);
-
-      setData([...data, response]);
+      await sendMessage(payload);
       e.target.reset();
     } catch (error) {
       setError("Error sending message");

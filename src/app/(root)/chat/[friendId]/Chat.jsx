@@ -2,13 +2,12 @@
 import ChatFeedHeader from "@/components/shared/Chats/ChatFeedHeader";
 import MessageForm from "@/components/shared/Chats/MessageForm";
 import MessageItem from "@/components/shared/Chats/MessageItem";
-import { toPusherKey } from "@/lib/pusher/pusher";
+import { pusherClient, toPusherKey } from "@/lib/pusher/pusher";
 import { useState, useEffect, useRef } from "react";
 
 const Chat = ({ messages, userId, friendId, chatId, friendData }) => {
   const [data, setData] = useState(messages);
   const messagesEndRef = useRef(null);
-  const eventSourceRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -23,16 +22,16 @@ const Chat = ({ messages, userId, friendId, chatId, friendData }) => {
 
     console.log("listening to ", `chat:${chatId}:messages`);
 
-    const friendRequestHandler = (message) => {
-      console.log("function got called for request", user);
+    const messagesHandler = (message) => {
+      console.log("function got called for message", message);
       setData([...data, message]);
     };
 
-    pusherClient.bind("receivedRequests", friendRequestHandler);
+    pusherClient.bind("messages", messagesHandler);
 
     return () => {
       pusherClient.unsubscribe(toPusherKey(`chat:${chatId}:messages`));
-      pusherClient.unbind("receivedRequests", friendRequestHandler);
+      pusherClient.unbind("messages", messagesHandler);
     };
   }, [chatId, data]);
 
@@ -45,12 +44,7 @@ const Chat = ({ messages, userId, friendId, chatId, friendData }) => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <MessageForm
-        userId={userId}
-        chatId={chatId}
-        data={data}
-        setData={setData}
-      />
+      <MessageForm chatId={chatId} />
     </div>
   );
 };

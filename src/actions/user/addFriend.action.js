@@ -90,9 +90,12 @@ export const confirmFriend = async (payload) => {
       };
     }
 
+    console.log("Accepting a friend request");
+
     // Remove friend request from received requests
     const receivedRequestsKey = `user:${currentUserId}:receivedRequests`;
     const removalResult = await db.srem(receivedRequestsKey, friendId);
+    console.log("removal result: ", removalResult);
 
     if (removalResult === 0) {
       return {
@@ -104,10 +107,12 @@ export const confirmFriend = async (payload) => {
     // Add friend to current user's friend list
     const userFriendsKey = `user:${currentUserId}:friends`;
     await db.sadd(userFriendsKey, friendId);
+    console.log("Accepting a friend request");
 
     // Add current user to friend's friend list
     const friendFriendsKey = `user:${friendId}:friends`;
     await db.sadd(friendFriendsKey, currentUserId);
+    console.log("Accepting a friend request");
 
     //* Fetch the user data and send it immediately to the client
     console.log("Fetching friend data");
@@ -115,7 +120,13 @@ export const confirmFriend = async (payload) => {
     console.log(userData);
 
     //* Notify the the request sender  that the request has been confirmed
-    await pusherServer.trigger(`user:${friendId}:chats`, "chats", userData);
+    // console.log("Pushing the request to the client on the subscrivber");
+
+    await pusherServer.trigger(
+      toPusherKey(`user:${friendId}:chats`),
+      "chats",
+      userData
+    );
 
     return {
       status: 200,

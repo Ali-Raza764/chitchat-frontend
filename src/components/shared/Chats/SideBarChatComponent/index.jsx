@@ -22,7 +22,7 @@ const SideBarChatComponent = async () => {
     console.error("An error occurred while fetching the chats", error);
   }
 
-  return <Chats friends={friends} />;
+  return <Chats friends={friends} sessionId={session.user.id} />;
 };
 
 export default SideBarChatComponent;

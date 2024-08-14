@@ -2,24 +2,34 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
+import { pusherServer, toPusherKey } from "@/lib/pusher/pusher";
 
 const sendMessage = async (payload) => {
-  const session = await auth();
-  if (!session) throw new Error("Not authenticated");
+  try {
+    const session = await auth();
+    if (!session) throw new Error("Not authenticated");
 
-  const { text, chatId } = payload;
-  const message = {
-    id: Date.now().toString(),
-    senderId: session.user.id,
-    content: text,
-    timestamp: new Date().toISOString(),
-  };
+    const { text, chatId } = payload;
+    const message = {
+      id: Date.now().toString(),
+      senderId: session.user.id,
+      content: text,
+      timestamp: new Date().toISOString(),
+    };
 
-  const redisKey = `chat:${chatId}:messages`;
+    const redisKey = `chat:${chatId}:messages`;
 
-  // Add message to the beginning of the list
-  await db.lpush(redisKey, JSON.stringify(message));
+    // Add message to the beginning of the list
+    await db.lpush(redisKey, JSON.stringify(message));
 
-  return message;
+    await pusherServer.trigger(toPusherKey(redisKey), "messages", message);
+
+    return {
+      status: 200,
+      message: "Messaage sent successfully",
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 export default sendMessage;

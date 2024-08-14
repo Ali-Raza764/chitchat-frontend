@@ -15,7 +15,7 @@ const Chats = ({ friends, sessionId }) => {
 
     const friendsChatHandler = (chat) => {
       console.log("function got called for request", chat);
-      setChats((prev) => [...prev, chat]);
+      setChats([...chats, chat]);
     };
 
     pusherClient.bind("chats", friendsChatHandler);
@@ -26,6 +26,9 @@ const Chats = ({ friends, sessionId }) => {
     };
   }, [pathname, sessionId]);
 
+  if ((chats.length === 0) | !chats) {
+    return <div className="p-2 h-[85%]">No Chats</div>;
+  }
   return (
     <div className="p-2 h-[85%]">
       <div className="chats overflow-y-auto h-full">
