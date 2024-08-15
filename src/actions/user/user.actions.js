@@ -18,7 +18,6 @@ export const LogOutUser = async () => {
       status: 200,
     };
   } catch (err) {
-    console.log(err);
     return {
       status: 500,
       message: err.message,

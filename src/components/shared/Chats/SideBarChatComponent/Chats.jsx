@@ -11,10 +11,8 @@ const Chats = ({ friends, sessionId }) => {
 
   useEffect(() => {
     pusherClient.subscribe(toPusherKey(`user:${sessionId}:chats`));
-    console.log("listening to ", `user:${sessionId}:chats`);
 
     const friendsChatHandler = (chat) => {
-      console.log("function got called for request", chat);
       setChats([...chats, chat]);
     };
 

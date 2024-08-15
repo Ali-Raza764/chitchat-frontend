@@ -14,7 +14,6 @@ const SignInForm = () => {
       setError("");
       await signInWithGoogle();
     } catch (err) {
-      console.log(err);
       setError(err.message);
     } finally {
       setLoading(false);

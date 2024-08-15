@@ -56,7 +56,7 @@ export const addFriend = async (payload) => {
     await db.sadd(receivedRequestsKey, currentUserId);
 
     //* Get the user data and send it immediately to the client
-    const userData = await db.get(`user:${friendId}`);
+    const userData = await db.get(`user:${currentUserId}`);
     await pusherServer.trigger(
       toPusherKey(`user:${friendId}:receivedRequests`),
       "receivedRequests",
@@ -90,40 +90,30 @@ export const confirmFriend = async (payload) => {
       };
     }
 
-    console.log("Accepting a friend request");
-
     // Remove friend request from received requests
     const receivedRequestsKey = `user:${currentUserId}:receivedRequests`;
     const removalResult = await db.srem(receivedRequestsKey, friendId);
-    console.log("removal result: ", removalResult);
-
-    if (removalResult === 0) {
-      return {
-        status: 404,
-        message: "Friend request not found",
-      };
-    }
 
     // Add friend to current user's friend list
     const userFriendsKey = `user:${currentUserId}:friends`;
     await db.sadd(userFriendsKey, friendId);
-    console.log("Accepting a friend request");
 
     // Add current user to friend's friend list
     const friendFriendsKey = `user:${friendId}:friends`;
     await db.sadd(friendFriendsKey, currentUserId);
-    console.log("Accepting a friend request");
 
     //* Fetch the user data and send it immediately to the client
-    console.log("Fetching friend data");
+    const friendData = await db.get(`user:${currentUserId}`);
     const userData = await db.get(`user:${friendId}`);
-    console.log(userData);
 
     //* Notify the the request sender  that the request has been confirmed
-    // console.log("Pushing the request to the client on the subscrivber");
-
     await pusherServer.trigger(
       toPusherKey(`user:${friendId}:chats`),
+      "chats",
+      friendData
+    );
+    await pusherServer.trigger(
+      toPusherKey(`user:${currentUserId}:chats`),
       "chats",
       userData
     );

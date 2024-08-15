@@ -20,10 +20,7 @@ const Chat = ({ messages, userId, friendId, chatId, friendData }) => {
   useEffect(() => {
     pusherClient.subscribe(toPusherKey(`chat:${chatId}:messages`));
 
-    console.log("listening to ", `chat:${chatId}:messages`);
-
     const messagesHandler = (message) => {
-      console.log("function got called for message", message);
       setData([...data, message]);
     };
 

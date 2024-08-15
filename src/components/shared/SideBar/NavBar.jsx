@@ -31,24 +31,24 @@ const NavBar = ({ requestIds, sessionId }) => {
     },
   ];
 
-  useEffect(() => {
-    pusherClient.subscribe(toPusherKey(`user:${sessionId}:receivedRequests`));
-    console.log("listening to ", `user:${sessionId}:receivedRequests`);
+  // useEffect(() => {
+  //   pusherClient.subscribe(toPusherKey(`user:${sessionId}:receivedRequests`));
+  //   console.log("listening to ", `user:${sessionId}:receivedRequests`);
 
-    const friendRequestHandler = (user) => {
-      console.log("function got called for request", user);
-      setIncomingFriendRequests((prev) => [...prev, user]);
-    };
+  //   const friendRequestHandler = (user) => {
+  //     console.log("function got called for request", user);
+  //     setIncomingFriendRequests((prev) => [...prev, user]);
+  //   };
 
-    pusherClient.bind("receivedRequests", friendRequestHandler);
+  //   pusherClient.bind("receivedRequests", friendRequestHandler);
 
-    return () => {
-      pusherClient.unsubscribe(
-        toPusherKey(`user:${sessionId}:receivedRequests`)
-      );
-      pusherClient.unbind("receivedRequests", friendRequestHandler);
-    };
-  }, [pathname, sessionId]);
+  //   return () => {
+  //     pusherClient.unsubscribe(
+  //       toPusherKey(`user:${sessionId}:receivedRequests`)
+  //     );
+  //     pusherClient.unbind("receivedRequests", friendRequestHandler);
+  //   };
+  // }, [pathname, sessionId]);
 
   return (
     <nav className="w-full flex items-center justify-between gap-6 px-4 border-b border-gray-700 h-[8%]">

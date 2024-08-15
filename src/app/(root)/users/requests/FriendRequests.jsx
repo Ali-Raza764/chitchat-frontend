@@ -18,10 +18,8 @@ const FriendRequests = ({ requests, sessionId }) => {
 
   useEffect(() => {
     pusherClient.subscribe(toPusherKey(`user:${sessionId}:receivedRequests`));
-    console.log("listening to ", `user:${sessionId}:receivedRequests`);
 
     const friendRequestHandler = (user) => {
-      console.log("function got called for request", user);
       setIncomingFriendRequests((prev) => [...prev, user]);
     };
 
@@ -70,7 +68,9 @@ const FriendRequests = ({ requests, sessionId }) => {
           {/* <ConfirmButton friendId={request.id} /> */}
           <button
             aria-label="Accept friend"
-            onClick={() => acceptFriend(request.id)}
+            onClick={() => {
+              acceptFriend(request.id);
+            }}
           >
             <BiCheck
               size={25}
