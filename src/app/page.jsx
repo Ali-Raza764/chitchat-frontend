@@ -1,12 +1,6 @@
 import { auth } from "@/auth";
 import SignInForm from "@/components/auth/SignInFrom";
 import React from "react";
-import { FaGoogle } from "react-icons/fa";
-import {
-  BiMessageSquareDetail,
-  BiSolidMessageSquareDetail,
-} from "react-icons/bi";
-import { MdConnectWithoutContact } from "react-icons/md";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
