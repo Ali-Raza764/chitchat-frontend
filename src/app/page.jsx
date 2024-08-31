@@ -6,15 +6,15 @@ import Image from "next/image";
 
 const LandingPage = async () => {
   const session = await auth();
-
   if (session != null) {
     redirect("/profile");
   }
+
   return (
     <div className="min-h-screen flex items-center justify-center text-white">
       <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center">
         {/* Left Side: Text */}
-        <div className="md:w-1/2 flex flex-col justify-center items-start space-y-6">
+        <div className="md:w-1/2 flex flex-col justify-center items-start space-y-6 mb-11">
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
             Unlimited Chatting{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-blue-500 to-purple-500">
@@ -29,13 +29,14 @@ const LandingPage = async () => {
         </div>
 
         {/* Right Side: Image and Sign-in Button */}
-        <div className="md:w-1/2 flex flex-col items-center md:items-end justify-start">
+        <div className="md:w-1/2 flex md:flex-col items-center md:items-end justify-start flex-col-reverse">
           <Image
             height={500}
             width={500}
             src="/images/hero.webp"
             alt="Chat Image"
-            className="max-w-[25rem] w-full mb-6 rounded-lg"
+            className="max-w-[25rem] w-full my-6 rounded-lg hidden md:block"
+            priority
           />
           <SignInForm />
         </div>

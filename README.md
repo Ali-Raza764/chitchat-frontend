@@ -4,7 +4,7 @@ Chit Chat is a real-time messaging web application built with modern technologie
 
 [Live Demo](https://chitchat-frontend-brown.vercel.app/profile)
 
-![Chit Chat Demo](./public/images/demo-image.png)
+![Chit Chat Demo](./public/images/demo-image.jpg)
 
 ## Technologies Used
 

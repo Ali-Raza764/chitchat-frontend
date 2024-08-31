@@ -11,10 +11,12 @@ const sendMessage = async (payload) => {
 
     const { text, chatId } = payload;
     const message = {
-      id: Date.now().toString(),
+      id: Date.now().toString(), // Replace by some real logic
       senderId: session.user.id,
       content: text,
-      timestamp: new Date().toISOString(),
+      attachment: {},
+      statusSeen: false,
+      timestamp: new Date().getHours() + ":" + new Date().getMinutes(),
     };
 
     const redisKey = `chat:${chatId}:messages`;

@@ -25,7 +25,7 @@ const FriendRequestsPage = async () => {
     <div>
       <h1 className="text-3xl font-semibold">Incoming Requests</h1>
       <div className="container flex items-center justify-center flex-col p-6">
-        <FriendRequests requests={requests} sessionId={session.user.id} />
+        <FriendRequests requests={requests} userId={session.user.id} />
       </div>
     </div>
   );

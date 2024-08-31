@@ -3,12 +3,16 @@ import { usePathname } from "next/navigation";
 import { FaComments, FaUsers, FaCog } from "react-icons/fa";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { pusherClient, toPusherKey } from "@/lib/pusher/pusher";
+import useStore from "@/utils/store/useChatStore";
+import FriendRequestToast from "@/components/toasts/FriendRequestToast";
+import toast from "react-hot-toast";
 
-const NavBar = ({ requestIds, sessionId }) => {
+const NavBar = () => {
   const pathname = usePathname();
-  const [incomingFriendRequests, setIncomingFriendRequests] =
-    useState(requestIds); //* Only ids for each request we just need the count
+  const { data, currentUser, setupPusherSubscription } = useStore();
+  const [incomingFriendRequests, setIncomingFriendRequests] = useState(
+    data.friendRequests || []
+  );
 
   const links = [
     {
@@ -31,24 +35,33 @@ const NavBar = ({ requestIds, sessionId }) => {
     },
   ];
 
-  // useEffect(() => {
-  //   pusherClient.subscribe(toPusherKey(`user:${sessionId}:receivedRequests`));
-  //   console.log("listening to ", `user:${sessionId}:receivedRequests`);
+  useEffect(() => {
+    if (currentUser) {
+      const unsubscribe = setupPusherSubscription();
 
-  //   const friendRequestHandler = (user) => {
-  //     console.log("function got called for request", user);
-  //     setIncomingFriendRequests((prev) => [...prev, user]);
-  //   };
+      // Subscribe to changes in the store's friendRequests
+      const unsubscribeFromStore = useStore.subscribe(
+        (state) => state.data.friendRequests,
+        (friendRequests) => {
+          setIncomingFriendRequests(friendRequests);
 
-  //   pusherClient.bind("receivedRequests", friendRequestHandler);
+          // Show toast notification for new request
+          if (
+            friendRequests.length > incomingFriendRequests.length &&
+            pathname !== "/users/requests"
+          ) {
+            const latestRequest = friendRequests[friendRequests.length - 1];
+            toast.custom(<FriendRequestToast name={latestRequest.name} />);
+          }
+        }
+      );
 
-  //   return () => {
-  //     pusherClient.unsubscribe(
-  //       toPusherKey(`user:${sessionId}:receivedRequests`)
-  //     );
-  //     pusherClient.unbind("receivedRequests", friendRequestHandler);
-  //   };
-  // }, [pathname, sessionId]);
+      return () => {
+        unsubscribe();
+        unsubscribeFromStore();
+      };
+    }
+  }, [currentUser, setupPusherSubscription, pathname]);
 
   return (
     <nav className="w-full flex items-center justify-between gap-6 px-4 border-b border-gray-700 h-[8%]">
@@ -62,15 +75,15 @@ const NavBar = ({ requestIds, sessionId }) => {
             key={link.name}
           >
             {link.icon}
-            <span className="request-count-users absolute top-0 right-0">
+            <span className="request-count-users absolute top-0 right-0 text-red-500">
               {link.name === "Users" && (
                 <div
-                  className={`rounded-full bg-green-500 p-1 hidden ${
-                    incomingFriendRequests?.length > 0 && "block"
+                  className={`rounded-full p-1 ${
+                    incomingFriendRequests.length > 0
+                      ? "flex bg-green-600 p-2"
+                      : "hidden"
                   }`}
-                >
-                  {incomingFriendRequests?.length}
-                </div>
+                />
               )}
             </span>
           </Link>
